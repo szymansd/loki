@@ -95,7 +95,9 @@ function createChromeDockerTarget({
   if (!chromeDockerWithoutSeccomp) {
     runArgs.push(`--security-opt=seccomp=${__dirname}/docker-seccomp.json`);
   }
-
+  debug(
+    `BaseURL: ${baseUrl}`
+  );
   if (baseUrl.indexOf('http://localhost') === 0) {
     const ip = getLocalIPAddress();
     if (!ip) {
