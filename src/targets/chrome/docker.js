@@ -91,7 +91,7 @@ function createChromeDockerTarget({
   const dockerPath = 'docker';
   const runArgs = ['run', '--rm', '-d', '-P'];
   const execute = getExecutor(dockerWithSudo);
-
+  console.log('Testing debug');
   if (!chromeDockerWithoutSeccomp) {
     runArgs.push(`--security-opt=seccomp=${__dirname}/docker-seccomp.json`);
   }
