@@ -56,7 +56,7 @@ const getNetworkHost = async (execute, dockerId) => {
   const runningInsideDocker =
     fs.existsSync('/proc/1/cgroup') &&
     /docker/.test(fs.readFileSync('/proc/1/cgroup', 'utf8'));
-
+  debug(`Running inside docker ${runningInsideDocker}`);
   // If we are running inside a docker container, our spawned docker chrome instance will be a sibling on the default
   // bridge, which means we can talk directly to it via its IP address.
   if (runningInsideDocker) {
@@ -135,7 +135,9 @@ function createChromeDockerTarget({
 
   async function start() {
     port = await getRandomPort();
-
+    debug(
+      `Starting docker`
+    );
     ensureDependencyAvailable('docker');
     const args = runArgs
       .concat([
