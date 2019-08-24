@@ -52,9 +52,17 @@ const waitOnCDPAvailable = (host, port) => {
         }
       }
     );
- }
   });
+}
 
+const debugDocker = async (execute) => {
+  const {code, stdout} = await execute('docker', [
+    '-D',
+    'info'
+  ]);
+  debug(`${stdout}`);
+}
+  
 const getNetworkHost = async (execute, dockerId) => {
   let host = '127.0.0.1';
 
