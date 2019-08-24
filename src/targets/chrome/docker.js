@@ -40,6 +40,7 @@ const waitOnCDPAvailable = (host, port) =>
         timeout: 5000,
       },
       err => {
+        debug(err);
         if (err) {
           reject(err);
         } else {
@@ -173,6 +174,7 @@ function createChromeDockerTarget({
       try {
         await waitOnCDPAvailable(host, port);
       } catch (error) {
+        debug(error);
         if (error.message === 'Timeout' && errorLogs.length !== 0) {
           throw new ChromeError(
             `Chrome failed to start with ${
