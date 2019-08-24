@@ -35,8 +35,8 @@ const waitOnCDPAvailable = (host, port) => {
   return new Promise((resolve, reject) => {
     waitOn(
       {
-        // resources: [`tcp:${host}:${port}`],
-        resources: [`tcp:0.0.0.0:${port}`],
+        resources: [`tcp:${host}:${port}`],
+        // resources: [`tcp:0.0.0.0:${port}`],
         delay: 50,
         interval: 100,
         timeout: 35000,
