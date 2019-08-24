@@ -86,6 +86,8 @@ const getNetworkHost = async (execute, dockerId) => {
     }
 
     host = stdout;
+    
+    await debugDocker(execute);
   }
 
   return host;
