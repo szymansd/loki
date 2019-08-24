@@ -38,6 +38,8 @@ const waitOnCDPAvailable = (host, port) =>
         delay: 50,
         interval: 100,
         timeout: 35000,
+        tcpTimeout: 1000,
+        log: true,
       },
       err => {
         debug(err);
