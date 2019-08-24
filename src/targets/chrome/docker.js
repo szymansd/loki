@@ -42,6 +42,7 @@ const waitOnCDPAvailable = (host, port) => {
         timeout: 35000,
         tcpTimeout: 1000,
         log: true,
+        verbose: true,
       },
       err => {
         debug(err);
@@ -55,10 +56,10 @@ const waitOnCDPAvailable = (host, port) => {
   });
 }
 
-const debugDocker = async (execute) => {
+const debugDocker = async (execute, dockerId) => {
   const {code, stdout} = await execute('docker', [
-    '-D',
-    'info'
+    'inspect',
+    dockerId
   ]);
   debug(`${stdout}`);
 }
@@ -87,7 +88,7 @@ const getNetworkHost = async (execute, dockerId) => {
 
     host = stdout;
     
-    await debugDocker(execute);
+    await debugDocker(execute, dockerId);
   }
 
   return host;
