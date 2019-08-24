@@ -30,8 +30,9 @@ const getLocalIPAddress = () => {
   return ips[0];
 };
 
-const waitOnCDPAvailable = (host, port) =>
-  new Promise((resolve, reject) => {
+const waitOnCDPAvailable = (host, port) => {
+  debug(`Waiting on: tcp:${host}:${port}`);
+  return new Promise((resolve, reject) => {
     waitOn(
       {
         resources: [`tcp:${host}:${port}`],
@@ -50,6 +51,7 @@ const waitOnCDPAvailable = (host, port) =>
         }
       }
     );
+ }
   });
 
 const getNetworkHost = async (execute, dockerId) => {
