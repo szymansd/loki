@@ -30,16 +30,22 @@ const getLocalIPAddress = () => {
   return ips[0];
 };
 
-const waitOnCDPAvailable = (host, port) =>
-  new Promise((resolve, reject) => {
+const waitOnCDPAvailable = (host, port) => {
+  debug(`Waiting on: tcp:${host}:${port}`);
+  return new Promise((resolve, reject) => {
     waitOn(
       {
         resources: [`tcp:${host}:${port}`],
+        // resources: [`tcp:0.0.0.0:${port}`],
         delay: 50,
         interval: 100,
-        timeout: 5000,
+        timeout: 35000,
+        tcpTimeout: 1000,
+        log: true,
+        verbose: true,
       },
       err => {
+        debug(err);
         if (err) {
           reject(err);
         } else {
@@ -48,7 +54,16 @@ const waitOnCDPAvailable = (host, port) =>
       }
     );
   });
+}
 
+const debugDocker = async (execute, dockerId) => {
+  const {code, stdout} = await execute('docker', [
+    'inspect',
+    dockerId
+  ]);
+  debug(`${stdout}`);
+}
+  
 const getNetworkHost = async (execute, dockerId) => {
   let host = '127.0.0.1';
 
@@ -56,7 +71,7 @@ const getNetworkHost = async (execute, dockerId) => {
   const runningInsideDocker =
     fs.existsSync('/proc/1/cgroup') &&
     /docker/.test(fs.readFileSync('/proc/1/cgroup', 'utf8'));
-
+  debug(`Running inside docker ${runningInsideDocker}`);
   // If we are running inside a docker container, our spawned docker chrome instance will be a sibling on the default
   // bridge, which means we can talk directly to it via its IP address.
   if (runningInsideDocker) {
@@ -72,6 +87,8 @@ const getNetworkHost = async (execute, dockerId) => {
     }
 
     host = stdout;
+    
+    await debugDocker(execute, dockerId);
   }
 
   return host;
@@ -91,11 +108,13 @@ function createChromeDockerTarget({
   const dockerPath = 'docker';
   const runArgs = ['run', '--rm', '-d', '-P'];
   const execute = getExecutor(dockerWithSudo);
-
+  console.log('Testing debug');
   if (!chromeDockerWithoutSeccomp) {
     runArgs.push(`--security-opt=seccomp=${__dirname}/docker-seccomp.json`);
   }
-
+  debug(
+    `BaseURL: ${baseUrl}`
+  );
   if (baseUrl.indexOf('http://localhost') === 0) {
     const ip = getLocalIPAddress();
     if (!ip) {
@@ -135,7 +154,9 @@ function createChromeDockerTarget({
 
   async function start() {
     port = await getRandomPort();
-
+    debug(
+      `Starting docker`
+    );
     ensureDependencyAvailable('docker');
     const args = runArgs
       .concat([
@@ -169,6 +190,7 @@ function createChromeDockerTarget({
       try {
         await waitOnCDPAvailable(host, port);
       } catch (error) {
+        debug(error);
         if (error.message === 'Timeout' && errorLogs.length !== 0) {
           throw new ChromeError(
             `Chrome failed to start with ${
